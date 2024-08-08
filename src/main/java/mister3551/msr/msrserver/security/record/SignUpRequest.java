@@ -1,6 +1,6 @@
-package mister3551.msr.msrserver.record;
+package mister3551.msr.msrserver.security.record;
 
-import mister3551.msr.msrserver.security.validator.anno.*;
+import mister3551.msr.msrserver.security.security.validator.anno.*;
 
 @ValidPassword
 public record SignUpRequest(

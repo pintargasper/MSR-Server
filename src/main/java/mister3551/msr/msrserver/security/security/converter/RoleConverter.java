@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.security.converter;
+package mister3551.msr.msrserver.security.security.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;

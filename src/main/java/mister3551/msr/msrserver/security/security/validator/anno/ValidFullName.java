@@ -1,8 +1,8 @@
-package mister3551.msr.msrserver.security.validator.anno;
+package mister3551.msr.msrserver.security.security.validator.anno;
 
 import com.nimbusds.jose.Payload;
 import jakarta.validation.Constraint;
-import mister3551.msr.msrserver.security.validator.FullNameValidator;
+import mister3551.msr.msrserver.security.security.validator.FullNameValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

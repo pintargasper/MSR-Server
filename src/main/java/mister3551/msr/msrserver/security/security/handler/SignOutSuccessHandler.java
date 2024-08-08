@@ -1,11 +1,11 @@
-package mister3551.msr.msrserver.security.handler;
+package mister3551.msr.msrserver.security.security.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import mister3551.msr.msrserver.security.impl.CustomResponse;
+import mister3551.msr.msrserver.security.security.impl.CustomResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 

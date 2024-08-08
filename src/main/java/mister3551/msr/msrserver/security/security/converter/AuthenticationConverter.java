@@ -1,6 +1,6 @@
-package mister3551.msr.msrserver.security.converter;
+package mister3551.msr.msrserver.security.security.converter;
 
-import mister3551.msr.msrserver.security.CustomUser;
+import mister3551.msr.msrserver.security.security.CustomUser;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

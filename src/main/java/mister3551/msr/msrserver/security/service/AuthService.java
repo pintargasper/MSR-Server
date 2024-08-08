@@ -1,9 +1,9 @@
-package mister3551.msr.msrserver.service;
+package mister3551.msr.msrserver.security.service;
 
-import mister3551.msr.msrserver.record.SignInRequest;
-import mister3551.msr.msrserver.record.SignUpRequest;
-import mister3551.msr.msrserver.repository.UsersRepository;
-import mister3551.msr.msrserver.security.CustomUser;
+import mister3551.msr.msrserver.security.record.SignInRequest;
+import mister3551.msr.msrserver.security.record.SignUpRequest;
+import mister3551.msr.msrserver.security.repository.UsersRepository;
+import mister3551.msr.msrserver.security.security.CustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

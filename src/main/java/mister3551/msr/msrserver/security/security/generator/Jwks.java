@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.security.generator;
+package mister3551.msr.msrserver.security.security.generator;
 
 import com.nimbusds.jose.jwk.RSAKey;
 

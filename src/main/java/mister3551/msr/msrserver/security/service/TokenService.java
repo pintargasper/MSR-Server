@@ -1,8 +1,8 @@
-package mister3551.msr.msrserver.service;
+package mister3551.msr.msrserver.security.service;
 
-import mister3551.msr.msrserver.record.SignUpRequest;
-import mister3551.msr.msrserver.security.CustomUser;
-import mister3551.msr.msrserver.security.record.JwtUser;
+import mister3551.msr.msrserver.security.record.SignUpRequest;
+import mister3551.msr.msrserver.security.security.CustomUser;
+import mister3551.msr.msrserver.security.security.record.JwtUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

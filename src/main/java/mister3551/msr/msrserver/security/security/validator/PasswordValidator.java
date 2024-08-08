@@ -1,10 +1,10 @@
-package mister3551.msr.msrserver.security.validator;
+package mister3551.msr.msrserver.security.security.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import mister3551.msr.msrserver.record.SignUpRequest;
-import mister3551.msr.msrserver.security.impl.ConstraintViolation;
-import mister3551.msr.msrserver.security.validator.anno.ValidPassword;
+import mister3551.msr.msrserver.security.record.SignUpRequest;
+import mister3551.msr.msrserver.security.security.impl.ConstraintViolation;
+import mister3551.msr.msrserver.security.security.validator.anno.ValidPassword;
 
 public class PasswordValidator implements ConstraintValidator<ValidPassword, Object>, ConstraintViolation {
 

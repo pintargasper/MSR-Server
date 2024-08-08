@@ -1,13 +1,13 @@
-package mister3551.msr.msrserver.security;
+package mister3551.msr.msrserver.security.security;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import mister3551.msr.msrserver.security.converter.AuthenticationConverter;
-import mister3551.msr.msrserver.security.generator.Jwks;
-import mister3551.msr.msrserver.security.handler.SignOutSuccessHandler;
+import mister3551.msr.msrserver.security.security.converter.AuthenticationConverter;
+import mister3551.msr.msrserver.security.security.generator.Jwks;
+import mister3551.msr.msrserver.security.security.handler.SignOutSuccessHandler;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

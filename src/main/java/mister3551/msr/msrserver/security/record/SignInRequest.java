@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.record;
+package mister3551.msr.msrserver.security.record;
 
 public record SignInRequest(
         String usernameOrEmailAddress,

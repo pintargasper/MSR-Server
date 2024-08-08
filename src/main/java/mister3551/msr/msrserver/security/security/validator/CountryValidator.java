@@ -1,9 +1,9 @@
-package mister3551.msr.msrserver.security.validator;
+package mister3551.msr.msrserver.security.security.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import mister3551.msr.msrserver.security.impl.ConstraintViolation;
-import mister3551.msr.msrserver.security.validator.anno.ValidCountry;
+import mister3551.msr.msrserver.security.security.impl.ConstraintViolation;
+import mister3551.msr.msrserver.security.security.validator.anno.ValidCountry;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,15 +1,14 @@
-package mister3551.msr.msrserver.security;
+package mister3551.msr.msrserver.security.security;
 
 import lombok.extern.slf4j.Slf4j;
-import mister3551.msr.msrserver.entity.User;
-import mister3551.msr.msrserver.repository.UsersRepository;
+import mister3551.msr.msrserver.security.entity.User;
+import mister3551.msr.msrserver.security.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;

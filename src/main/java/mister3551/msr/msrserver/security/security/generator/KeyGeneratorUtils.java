@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.security.generator;
+package mister3551.msr.msrserver.security.security.generator;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;

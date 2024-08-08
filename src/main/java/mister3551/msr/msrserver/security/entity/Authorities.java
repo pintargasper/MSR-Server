@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.entity;
+package mister3551.msr.msrserver.security.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

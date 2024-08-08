@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.security;
+package mister3551.msr.msrserver.security.security;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,7 @@
-package mister3551.msr.msrserver.repository;
+package mister3551.msr.msrserver.security.repository;
 
 import jakarta.transaction.Transactional;
-import mister3551.msr.msrserver.entity.User;
+import mister3551.msr.msrserver.security.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
