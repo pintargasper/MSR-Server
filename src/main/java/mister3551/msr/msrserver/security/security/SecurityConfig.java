@@ -75,8 +75,15 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .cors(cors -> cors.configure(http))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/error").permitAll()
                                 .requestMatchers("/sign-up").permitAll()
+
+                                .requestMatchers("/get-news").permitAll()
+                                .requestMatchers("/news/{title}").permitAll()
+                                .requestMatchers("/news/suggestions/{title}").permitAll()
+
+                                .requestMatchers("/images/{path}/{name}").permitAll()
+
+                                .requestMatchers("/favicon.ico").permitAll()
 
                                 .requestMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                                 .requestMatchers("/admin").hasAuthority("ROLE_ADMIN")

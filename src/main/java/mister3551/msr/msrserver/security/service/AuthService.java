@@ -1,5 +1,6 @@
 package mister3551.msr.msrserver.security.service;
 
+import mister3551.msr.msrserver.security.entity.User;
 import mister3551.msr.msrserver.security.record.SignInRequest;
 import mister3551.msr.msrserver.security.record.SignUpRequest;
 import mister3551.msr.msrserver.security.repository.UsersRepository;
@@ -29,11 +30,11 @@ public class AuthService {
     private final UsersRepository usersRepository;
 
     @Autowired
-    public AuthService(TokenService tokenService, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, UsersRepository usersRepository) {
+    public AuthService(TokenService tokenService, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, UsersRepository userRepository) {
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.usersRepository = usersRepository;
+        this.usersRepository = userRepository;
     }
 
     public String signIn(SignInRequest signInRequest) {
@@ -63,14 +64,14 @@ public class AuthService {
 
     public String signUp(SignUpRequest signUpRequest) {
 
-        int userByUsername = usersRepository.findByUsername(signUpRequest.username());
-        int userByEmailAddress = usersRepository.findByEmailAddress(signUpRequest.emailAddress());
+        User userByUsername = usersRepository.findByUsername(signUpRequest.username());
+        User userByEmail = usersRepository.findByEmailAddress(signUpRequest.emailAddress());
 
-        if (userByUsername >= 1) {
+        if (userByUsername != null) {
             return "Username already exists";
         }
 
-        if (userByEmailAddress >= 1) {
+        if (userByEmail != null) {
             return "Email address already exists";
         }
 

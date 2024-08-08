@@ -1,13 +1,18 @@
 package mister3551.msr.msrserver.security.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @Entity
+@Table(name = "get_user")
 public class User {
 
     @Id
@@ -21,6 +26,6 @@ public class User {
     private String country;
     private boolean accountConfirmed;
     private boolean accountLocked;
-    private String unlockDate;
+    private LocalDateTime unlockDate;
     private int reportsNumber;
 }
