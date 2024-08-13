@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.config;
+package mister3551.msr.msrserver.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

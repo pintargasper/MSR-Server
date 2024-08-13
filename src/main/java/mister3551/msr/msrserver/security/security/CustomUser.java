@@ -16,6 +16,7 @@ public class CustomUser extends User {
     private static final long serialVersionUID = 1L;
 
     private String fullName;
+    private String username;
     private String emailAddress;
     private String country;
     private boolean accountConfirmed;
@@ -24,6 +25,7 @@ public class CustomUser extends User {
     public CustomUser(String fullName, String username, String password, String emailAddress, Collection<? extends GrantedAuthority> authorities, String country, boolean accountConfirmed, boolean accountLocked) {
         super(username, password, authorities);
         this.fullName = fullName;
+        this.username = username;
         this.emailAddress = emailAddress;
         this.country = country;
         this.accountConfirmed = accountConfirmed;
@@ -34,6 +36,7 @@ public class CustomUser extends User {
     public String toString() {
         return "User full name = " + fullName
                 + ", email Address = " + emailAddress
+                + ", username = " + username
                 + ", country =" + country
                 + ", country =" + accountConfirmed
                 + ", country =" + accountLocked

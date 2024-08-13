@@ -1,25 +1,24 @@
 package mister3551.msr.msrserver.security.service;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import mister3551.msr.msrserver.security.entity.User;
 import mister3551.msr.msrserver.security.record.SignInRequest;
 import mister3551.msr.msrserver.security.record.SignUpRequest;
 import mister3551.msr.msrserver.security.repository.UsersRepository;
 import mister3551.msr.msrserver.security.security.CustomUser;
+import mister3551.msr.msrserver.security.security.handler.SignOutSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
 
 @Service
 public class AuthService {
@@ -28,6 +27,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UsersRepository usersRepository;
+    private final SignOutSuccessHandler signOutSuccessHandler;
 
     @Autowired
     public AuthService(TokenService tokenService, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, UsersRepository userRepository) {
@@ -35,6 +35,37 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.usersRepository = userRepository;
+        this.signOutSuccessHandler = new SignOutSuccessHandler();
+    }
+
+    public String adminSignIn(SignInRequest signInRequest) {
+        String token;
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(signInRequest.usernameOrEmailAddress(), signInRequest.password())
+            );
+
+            CustomUser userDetails = (CustomUser) authentication.getPrincipal();
+
+            boolean hasAdminRole = userDetails.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+            if (!hasAdminRole) {
+                return "No privileges";
+            }
+
+            token = tokenService.generateToken(authentication);
+
+        } catch (BadCredentialsException badCredentialsException) {
+            return "Bad Credentials";
+        }
+
+        if (token == null) {
+            return "Invalid";
+        }
+
+        return token;
     }
 
     public String signIn(SignInRequest signInRequest) {
@@ -82,7 +113,7 @@ public class AuthService {
                 signUpRequest.username(),
                 signUpRequest.emailAddress(),
                 bCryptPasswordEncoder.encode(signUpRequest.password()),
-                LocalDate.parse(signUpRequest.birthdate()),
+                signUpRequest.birthdate(),
                 signUpRequest.country(),
                 generatedToken) == 1) {
             if (usersRepository.insertUserRole(signUpRequest.username()) == 1) {
@@ -95,18 +126,11 @@ public class AuthService {
         return "Something went wrong";
     }
 
-    public Map<String, String> handleValidationException(MethodArgumentNotValidException methodArgumentNotValidException) {
-        Map<String, String> errors = new HashMap<>();
-        List<ObjectError> globalErrors = methodArgumentNotValidException.getBindingResult().getGlobalErrors();
-        List<FieldError> fieldErrors = methodArgumentNotValidException.getBindingResult().getFieldErrors();
+    public void signOut(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws ServletException, IOException {
+        signOutSuccessHandler.onLogoutSuccess(httpServletRequest, httpServletResponse, authentication);
+    }
 
-        for (ObjectError error : globalErrors) {
-            errors.put("global", error.getDefaultMessage());
-        }
-
-        for (FieldError error : fieldErrors) {
-            errors.put(error.getField(), error.getDefaultMessage());
-        }
-        return errors;
+    public Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

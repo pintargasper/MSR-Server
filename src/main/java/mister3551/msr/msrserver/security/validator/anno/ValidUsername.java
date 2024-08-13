@@ -1,8 +1,8 @@
-package mister3551.msr.msrserver.security.security.validator.anno;
+package mister3551.msr.msrserver.security.validator.anno;
 
 import com.nimbusds.jose.Payload;
 import jakarta.validation.Constraint;
-import mister3551.msr.msrserver.security.security.validator.UsernameValidator;
+import mister3551.msr.msrserver.security.validator.UsernameValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -21,6 +21,7 @@ public @interface ValidUsername {
     String lengthMessage() default "Username must be between 4 and 16 characters long";
     String uppercaseMessage() default "Username must not contains uppercase letters";
     String specialCharactersMessage() default "Username must not contains special characters";
+    String existsMessage() default "Username already exists";
 
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

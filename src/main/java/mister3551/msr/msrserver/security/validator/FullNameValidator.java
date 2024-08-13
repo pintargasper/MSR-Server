@@ -1,13 +1,13 @@
-package mister3551.msr.msrserver.security.security.validator;
+package mister3551.msr.msrserver.security.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import mister3551.msr.msrserver.security.security.impl.ConstraintViolation;
-import mister3551.msr.msrserver.security.security.validator.anno.ValidFullName;
+import mister3551.msr.msrserver.security.validator.anno.ValidFullName;
+import mister3551.msr.msrserver.security.validator.impl.ConstraintViolation;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FullNameValidator implements ConstraintValidator<ValidFullName, String>, ConstraintViolation {
+public class FullNameValidator implements ConstraintValidator<ValidFullName, Object>, ConstraintViolation {
 
     private String lengthMessage;
     private String numbersMessage;
@@ -19,7 +19,9 @@ public class FullNameValidator implements ConstraintValidator<ValidFullName, Str
     }
 
     @Override
-    public boolean isValid(String fullName, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Object Object, ConstraintValidatorContext constraintValidatorContext) {
+
+        String fullName = (String) Object;
 
         if (fullName.length() < 3 || fullName.length() > 30) {
             constraintViolation(constraintValidatorContext, lengthMessage);

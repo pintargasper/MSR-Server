@@ -1,8 +1,8 @@
-package mister3551.msr.msrserver.security.security.validator.anno;
+package mister3551.msr.msrserver.security.validator.anno;
 
 import com.nimbusds.jose.Payload;
 import jakarta.validation.Constraint;
-import mister3551.msr.msrserver.security.security.validator.CountryValidator;
+import mister3551.msr.msrserver.security.validator.EmailAddressValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -13,12 +13,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({TYPE, FIELD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = CountryValidator.class)
+@Constraint(validatedBy = EmailAddressValidator.class)
 @Documented
-public @interface ValidCountry {
+public @interface ValidEmailAddress {
 
-    String message() default "Country must exists";
-    String numbersMessage() default "Country must not contains numbers";
+    String message() default "Invalid email address pattern";
+    String existsMessage() default "Email address already exists";
 
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

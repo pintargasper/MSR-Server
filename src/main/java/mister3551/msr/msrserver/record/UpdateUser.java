@@ -1,19 +1,19 @@
-package mister3551.msr.msrserver.security.record;
+package mister3551.msr.msrserver.record;
 
 import mister3551.msr.msrserver.security.validator.anno.*;
+import org.springframework.web.multipart.MultipartFile;
 
-@ValidPassword
-public record SignUpRequest(
+public record UpdateUser(
         @ValidFullName
         String fullName,
         @ValidUsername
         String username,
         @ValidEmailAddress
         String emailAddress,
-        String password,
-        String confirmPassword,
         @ValidBirthdate
         String birthdate,
         @ValidCountry
-        String country) {
+        String country,
+        @ValidImage
+        MultipartFile image) {
 }

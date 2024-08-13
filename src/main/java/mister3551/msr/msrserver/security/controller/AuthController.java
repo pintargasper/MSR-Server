@@ -1,15 +1,17 @@
 package mister3551.msr.msrserver.security.controller;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import mister3551.msr.msrserver.security.record.SignInRequest;
 import mister3551.msr.msrserver.security.record.SignUpRequest;
 import mister3551.msr.msrserver.security.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.io.IOException;
 
 @RestController
 public class AuthController {
@@ -19,6 +21,11 @@ public class AuthController {
     @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
+    }
+
+    @PostMapping("/admin")
+    public String adminSignIn(@RequestBody SignInRequest signInRequest) {
+        return authService.adminSignIn(signInRequest);
     }
 
     @PostMapping("/sign-in")
@@ -32,13 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-out")
-    public void signOut() {
-
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(MethodArgumentNotValidException methodArgumentNotValidException) {
-        return authService.handleValidationException(methodArgumentNotValidException);
+    public void signOut(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws ServletException, IOException {
+        authService.signOut(httpServletRequest, httpServletResponse, authentication);
     }
 }

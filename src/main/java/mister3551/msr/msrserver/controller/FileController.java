@@ -18,7 +18,7 @@ public class FileController {
     }
 
     @GetMapping("/images/{path}/{name}")
-    public ResponseEntity<byte[]> getImage(@PathVariable("path") String path, @PathVariable("name") String name) throws Exception {
+    public ResponseEntity<byte[]> image(@PathVariable("path") String path, @PathVariable("name") String name) throws Exception {
         return fileService.getImage(path, name);
     }
 }

@@ -1,4 +1,4 @@
-package mister3551.msr.msrserver.security.security.impl;
+package mister3551.msr.msrserver.security.validator.impl;
 
 import jakarta.validation.ConstraintValidatorContext;
 

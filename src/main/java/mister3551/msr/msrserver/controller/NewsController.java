@@ -20,17 +20,17 @@ public class NewsController {
     }
 
     @GetMapping("/get-news")
-    public ArrayList<News> getNews() {
+    public ArrayList<News> news() {
         return newsService.getNews();
     }
 
     @GetMapping("/news/{title}")
-    public News getNewsByTitle(@PathVariable("title") String title) {
+    public News newsByTitle(@PathVariable("title") String title) {
         return newsService.getNewsByTitle(title);
     }
 
     @GetMapping("/news/suggestions/{title}")
-    public ArrayList<News> getNewsSuggestions(@PathVariable("title") String title) {
+    public ArrayList<News> newsSuggestions(@PathVariable("title") String title) {
         return newsService.getNewsSuggestions(title);
     }
 }

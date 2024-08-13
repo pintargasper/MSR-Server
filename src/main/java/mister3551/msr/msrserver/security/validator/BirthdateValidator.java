@@ -1,16 +1,16 @@
-package mister3551.msr.msrserver.security.security.validator;
+package mister3551.msr.msrserver.security.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import mister3551.msr.msrserver.security.security.impl.ConstraintViolation;
-import mister3551.msr.msrserver.security.security.validator.anno.ValidBirthdate;
+import mister3551.msr.msrserver.security.validator.anno.ValidBirthdate;
+import mister3551.msr.msrserver.security.validator.impl.ConstraintViolation;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.Period;
 
 @Component
-public class BirthdateValidator implements ConstraintValidator<ValidBirthdate, String>, ConstraintViolation {
+public class BirthdateValidator implements ConstraintValidator<ValidBirthdate, Object>, ConstraintViolation {
 
     private String nullBirthdate;
     private String characterMessage;
@@ -24,7 +24,8 @@ public class BirthdateValidator implements ConstraintValidator<ValidBirthdate, S
     }
 
     @Override
-    public boolean isValid(String birthdate, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Object Object, ConstraintValidatorContext constraintValidatorContext) {
+        String birthdate = (String) Object;
 
         if (birthdate == null) {
             constraintViolation(constraintValidatorContext, nullBirthdate);

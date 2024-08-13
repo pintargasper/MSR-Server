@@ -1,8 +1,8 @@
-package mister3551.msr.msrserver.security.security.validator.anno;
+package mister3551.msr.msrserver.security.validator.anno;
 
 import com.nimbusds.jose.Payload;
 import jakarta.validation.Constraint;
-import mister3551.msr.msrserver.security.security.validator.PasswordValidator;
+import mister3551.msr.msrserver.security.validator.PasswordValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -24,6 +24,8 @@ public @interface ValidPassword {
     String lowercaseMessage() default "Password must contain at least one lowercase letter";
     String numbersMessage() default "Password must contain at least one number";
     String specialCharacterMessage() default "Password must contain at least one special character (!, @, #, $, %, ^, &, *, ())";
+    String currentMessage() default "Incorrect current password";
+    String passwordChangeTimer() default "You can change your password in";
 
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

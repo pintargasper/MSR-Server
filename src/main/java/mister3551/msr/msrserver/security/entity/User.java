@@ -16,16 +16,17 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    private Integer idUser;
+    private Long idUser;
     private String fullName;
     private String username;
     private String emailAddress;
     private String password;
     private String authorities;
-    private LocalDate birthDate;
+    private LocalDate birthdate;
     private String country;
     private boolean accountConfirmed;
     private boolean accountLocked;
     private LocalDateTime unlockDate;
+    private LocalDateTime passwordChangeTimer;
     private int reportsNumber;
 }

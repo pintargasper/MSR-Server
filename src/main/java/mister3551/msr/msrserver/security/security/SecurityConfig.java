@@ -7,7 +7,6 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import mister3551.msr.msrserver.security.security.converter.AuthenticationConverter;
 import mister3551.msr.msrserver.security.security.generator.Jwks;
-import mister3551.msr.msrserver.security.security.handler.SignOutSuccessHandler;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +29,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -58,9 +56,10 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     SecurityFilterChain tokenSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/sign-in")
+                .securityMatcher("/admin", "/sign-in")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/sign-in").permitAll())
+                        .requestMatchers("/admin", "/sign-in").permitAll()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(withDefaults())
@@ -83,21 +82,26 @@ public class SecurityConfig implements WebMvcConfigurer {
 
                                 .requestMatchers("/images/{path}/{name}").permitAll()
 
+                                .requestMatchers("/countries").permitAll()
+
                                 .requestMatchers("/favicon.ico").permitAll()
 
                                 .requestMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                                .requestMatchers("/admin").hasAuthority("ROLE_ADMIN")
+
+                                .requestMatchers("/user/data").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/user/update").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/user/change-password").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/user/delete").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+
+                                //Auth
+                                .requestMatchers("/auth/admin").hasAuthority("ROLE_ADMIN")
+                                .requestMatchers("/auth/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/auth/public").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+
+                                //Admin
+                                .requestMatchers("/dashboard").hasAuthority("ROLE_ADMIN")
+
                                 .anyRequest().authenticated())
-                .logout(signOut ->
-                        signOut
-                                .logoutUrl("/sign-out")
-                                .logoutSuccessUrl("/sign-out-success")
-                                .logoutSuccessHandler(logoutSuccessHandler())
-                                .clearAuthentication(true)
-                                .invalidateHttpSession(false)
-                                .deleteCookies("JSESSIONID")
-                                .permitAll(false)
-                )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(new AuthenticationConverter())))
                 .sessionManagement(session -> session
@@ -135,11 +139,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     JwtDecoder jwtDecoder() throws JOSEException {
         return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
-    }
-
-    @Bean
-    public LogoutSuccessHandler logoutSuccessHandler() {
-        return new SignOutSuccessHandler();
     }
 
     @Override
