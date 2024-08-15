@@ -16,7 +16,6 @@ public final class Jwks {
         KeyPair keyPair = KeyGeneratorUtils.generateRsaKey();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        System.err.println("\n\nKeys:\n\tPublic Key: " + publicKey + " \n\n\n\tPrivate Key: " + privateKey + "\n\n");
         return new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
                 .keyID(UUID.randomUUID().toString())

@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public String signIn(@RequestBody SignInRequest signInRequest) {
+    public String[] signIn(@RequestBody SignInRequest signInRequest) {
         return authService.signIn(signInRequest);
     }
 

@@ -95,8 +95,9 @@ public class SecurityConfig implements WebMvcConfigurer {
 
                                 //Auth
                                 .requestMatchers("/auth/admin").hasAuthority("ROLE_ADMIN")
-                                .requestMatchers("/auth/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/auth/user").hasAnyAuthority("ROLE_USER")
                                 .requestMatchers("/auth/public").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/auth/error").permitAll()
 
                                 //Admin
                                 .requestMatchers("/dashboard").hasAuthority("ROLE_ADMIN")

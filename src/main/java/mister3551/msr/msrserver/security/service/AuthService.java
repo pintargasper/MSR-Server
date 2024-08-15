@@ -14,11 +14,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -46,51 +49,74 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(signInRequest.usernameOrEmailAddress(), signInRequest.password())
             );
 
-            CustomUser userDetails = (CustomUser) authentication.getPrincipal();
+            CustomUser customUser = (CustomUser) authentication.getPrincipal();
 
-            boolean hasAdminRole = userDetails.getAuthorities().stream()
+            boolean hasRoleUser = customUser.getAuthorities().stream()
                     .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
 
-            if (!hasAdminRole) {
+            if (!hasRoleUser) {
                 return "No privileges";
             }
 
-            token = tokenService.generateToken(authentication);
+            Collection<? extends GrantedAuthority> userOnlyAuthorities = customUser.getAuthorities().stream()
+                    .filter(authority -> authority.getAuthority().equals("ROLE_ADMIN"))
+                    .collect(Collectors.toList());
 
+            Authentication limitedAuthentication = new UsernamePasswordAuthenticationToken(
+                    authentication.getPrincipal(),
+                    authentication.getCredentials(),
+                    userOnlyAuthorities
+            );
+            token = tokenService.generateToken(limitedAuthentication);
         } catch (BadCredentialsException badCredentialsException) {
             return "Bad Credentials";
         }
-
-        if (token == null) {
-            return "Invalid";
-        }
-
         return token;
     }
 
-    public String signIn(SignInRequest signInRequest) {
+    public String[] signIn(SignInRequest signInRequest) {
         String token;
+        String username;
 
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(signInRequest.usernameOrEmailAddress(), signInRequest.password())
             );
 
-            token = tokenService.generateToken(authentication);
+            CustomUser customUser = (CustomUser) authentication.getPrincipal();
 
-            CustomUser userDetails = (CustomUser) authentication.getPrincipal();
-            if (!userDetails.isAccountConfirmed()) {
-                return "Email address is not confirmed";
+            boolean hasRoleUser = customUser.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_USER"));
+
+            if (!hasRoleUser) {
+                return new String[]{"No privileges"};
             }
 
-            if (userDetails.isAccountLocked()) {
-                return "Account is Locked";
+            if (!customUser.isAccountConfirmed()) {
+                return new String[]{"Email address is not confirmed"};
             }
+
+            if (customUser.isAccountLocked()) {
+                return new String[]{"Account is Locked"};
+            }
+
+            Collection<? extends GrantedAuthority> userOnlyAuthorities = customUser.getAuthorities().stream()
+                    .filter(authority -> authority.getAuthority().equals("ROLE_USER"))
+                    .collect(Collectors.toList());
+
+            Authentication limitedAuthentication = new UsernamePasswordAuthenticationToken(
+                    authentication.getPrincipal(),
+                    authentication.getCredentials(),
+                    userOnlyAuthorities
+            );
+            token = tokenService.generateToken(limitedAuthentication);
+
+            username = customUser.getUsername();
 
         } catch (BadCredentialsException badCredentialsException) {
-            return "Bad Credentials";
+            return new String[]{"Bad Credentials"};
         }
-        return token;
+        return new String[]{token, username};
     }
 
     public String signUp(SignUpRequest signUpRequest) {
