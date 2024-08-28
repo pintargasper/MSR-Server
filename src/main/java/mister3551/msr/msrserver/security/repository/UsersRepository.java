@@ -42,4 +42,21 @@ public interface UsersRepository extends JpaRepository<User, Integer> {
             "AND email_address = :emailAddress;", nativeQuery = true)
     void deleteUser(@Param("username") String username,
                    @Param("username") String emailAddress);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO statistics (id_user) " +
+            "SELECT u.id_user " +
+            "FROM users u " +
+            "WHERE u.username = :username;", nativeQuery = true)
+    int insertUserStatistics(@Param("username") String username);
+
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE ua FROM users_authorities ua " +
+            "JOIN users u ON ua.id_user = u.id_user " +
+            "WHERE u.username = :username",
+            nativeQuery = true)
+    void deleteUserRole(@Param("username") String username);
 }

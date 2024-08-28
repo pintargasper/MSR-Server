@@ -68,7 +68,6 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configure(http))
@@ -87,6 +86,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 .requestMatchers("/favicon.ico").permitAll()
 
                                 .requestMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+
+                                .requestMatchers("/user/statistics").hasAnyAuthority("ROLE_USER")
+                                .requestMatchers("/user/weapon/statistics").hasAnyAuthority("ROLE_USER")
 
                                 .requestMatchers("/user/data").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                                 .requestMatchers("/user/update").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
