@@ -34,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public String signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public String signUp(@Valid @RequestBody SignUpRequest signUpRequest) throws IOException, javax.mail.MessagingException {
         return authService.signUp(signUpRequest);
     }
 

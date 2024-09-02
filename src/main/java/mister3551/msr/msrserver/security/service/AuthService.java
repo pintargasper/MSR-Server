@@ -3,12 +3,15 @@ package mister3551.msr.msrserver.security.service;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import mister3551.msr.msrserver.entity.UserData;
+import mister3551.msr.msrserver.repository.UserRepository;
 import mister3551.msr.msrserver.security.entity.User;
 import mister3551.msr.msrserver.security.record.SignInRequest;
 import mister3551.msr.msrserver.security.record.SignUpRequest;
 import mister3551.msr.msrserver.security.repository.UsersRepository;
 import mister3551.msr.msrserver.security.security.CustomUser;
 import mister3551.msr.msrserver.security.security.handler.SignOutSuccessHandler;
+import mister3551.msr.msrserver.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -27,17 +31,21 @@ import java.util.stream.Collectors;
 public class AuthService {
 
     private final TokenService tokenService;
+    private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
     private final SignOutSuccessHandler signOutSuccessHandler;
 
     @Autowired
-    public AuthService(TokenService tokenService, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, UsersRepository userRepository) {
+    public AuthService(TokenService tokenService, EmailService emailService, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, UsersRepository userRepository, UserRepository userRepository1) {
         this.tokenService = tokenService;
+        this.emailService = emailService;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.usersRepository = userRepository;
+        this.userRepository = userRepository1;
         this.signOutSuccessHandler = new SignOutSuccessHandler();
     }
 
@@ -119,8 +127,7 @@ public class AuthService {
         return new String[]{token, username};
     }
 
-    public String signUp(SignUpRequest signUpRequest) {
-
+    public String signUp(SignUpRequest signUpRequest) throws IOException, MessagingException {
         User userByUsername = usersRepository.findByUsername(signUpRequest.username());
         User userByEmail = usersRepository.findByEmailAddress(signUpRequest.emailAddress());
 
@@ -142,12 +149,25 @@ public class AuthService {
                 signUpRequest.birthdate(),
                 signUpRequest.country(),
                 generatedToken) == 1) {
-            if (usersRepository.insertUserRole(signUpRequest.username()) == 1) {
-                return "User successfully created";
-            } else {
-                usersRepository.deleteUser(signUpRequest.username(), signUpRequest.emailAddress());
+
+            UserData userData = userRepository.findByUsernameAndEmailAddress(signUpRequest.username(), signUpRequest.emailAddress());
+            if (userData == null) {
                 return "Something went wrong";
             }
+
+            Long userId = userData.getId();
+
+            boolean success = usersRepository.insertUserRole(userId) == 1 &&
+                    usersRepository.insertUserStatistics(userId) == 1 &&
+                    usersRepository.insertUserMissionsStatistics(userId) == 1 &&
+                    usersRepository.insertUserWeaponsStatistics(userId) == 1;
+
+            if (!success) {
+                clearData(userId);
+                return "Something went wrong";
+            }
+            emailService.sendConfirmEmail(signUpRequest, generatedToken);
+            return "SUCCESS";
         }
         return "Something went wrong";
     }
@@ -158,5 +178,14 @@ public class AuthService {
 
     public Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    public boolean clearData(Long idUser) {
+        usersRepository.deleteUserRole(idUser);
+        usersRepository.deleteUserStatistics(idUser);
+        usersRepository.deleteUserMissionStatistics(idUser);
+        usersRepository.deleteUserWeaponStatistics(idUser);
+        usersRepository.deleteUser(idUser);
+        return true;
     }
 }

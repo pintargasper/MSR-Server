@@ -30,33 +30,59 @@ public interface UsersRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO users_authorities (id_user, id_authority) " +
-            "SELECT u.id_user, 3 " +
-            "FROM users u " +
-            "WHERE u.username = :username;", nativeQuery = true)
-    int insertUserRole(@Param("username") String username);
-
-    @Modifying
-    @Transactional
-    @Query(value = "DELETE FROM users " +
-            "WHERE username = :username " +
-            "AND email_address = :emailAddress;", nativeQuery = true)
-    void deleteUser(@Param("username") String username,
-                   @Param("username") String emailAddress);
+            "VALUES (:idUser, 3)", nativeQuery = true)
+    int insertUserRole(@Param("idUser") Long idUser);
 
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO statistics (id_user) " +
-            "SELECT u.id_user " +
-            "FROM users u " +
-            "WHERE u.username = :username;", nativeQuery = true)
-    int insertUserStatistics(@Param("username") String username);
+            "VALUES (:idUser)", nativeQuery = true)
+    int insertUserStatistics(@Param("idUser") Long idUser);
 
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO missions_statistics (id_user) " +
+            "VALUES (:idUser)", nativeQuery = true)
+    int insertUserMissionsStatistics(@Param("idUser") Long idUser);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO weapons_statistics (id_user) " +
+            "VALUES (:idUser)", nativeQuery = true)
+    int insertUserWeaponsStatistics(@Param("idUser") Long idUser);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE u FROM users u " +
+            "WHERE u.id_user = :idUser",
+            nativeQuery = true)
+    void deleteUser(@Param("idUser") Long idUser);
 
     @Modifying
     @Transactional
     @Query(value = "DELETE ua FROM users_authorities ua " +
-            "JOIN users u ON ua.id_user = u.id_user " +
-            "WHERE u.username = :username",
+            "WHERE ua.id_user = :idUser",
             nativeQuery = true)
-    void deleteUserRole(@Param("username") String username);
+    void deleteUserRole(@Param("idUser") Long idUser);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE s FROM statistics s " +
+            "WHERE s.id_user = :idUser",
+            nativeQuery = true)
+    void deleteUserStatistics(@Param("idUser") Long idUser);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE s FROM missions_statistics s " +
+            "WHERE s.id_user = :idUser",
+            nativeQuery = true)
+    void deleteUserMissionStatistics(@Param("idUser") Long idUser);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE s FROM weapons_statistics s " +
+            "WHERE s.id_user = :idUser",
+            nativeQuery = true)
+    void deleteUserWeaponStatistics(@Param("idUser") Long idUser);
 }

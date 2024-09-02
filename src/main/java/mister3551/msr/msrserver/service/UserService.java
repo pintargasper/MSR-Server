@@ -2,11 +2,16 @@ package mister3551.msr.msrserver.service;
 
 import mister3551.msr.msrserver.entity.UserData;
 import mister3551.msr.msrserver.record.ResetPassword;
+import mister3551.msr.msrserver.record.ResetPasswordWithToken;
 import mister3551.msr.msrserver.record.UpdateUser;
 import mister3551.msr.msrserver.repository.UserRepository;
 import mister3551.msr.msrserver.security.security.CustomUser;
+import mister3551.msr.msrserver.security.security.converter.AuthenticationToken;
+import mister3551.msr.msrserver.security.service.AuthService;
 import mister3551.msr.msrserver.security.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,46 +25,44 @@ public class UserService {
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final FileService fileService;
+    private final AuthService authService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserService(UserRepository userRepository, TokenService tokenService, FileService fileService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, TokenService tokenService, FileService fileService, AuthService authService, BCryptPasswordEncoder bCryptPasswordEncoder, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.fileService = fileService;
+        this.authService = authService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
-
-    public UserData getUserData(Authentication authentication) {
-        CustomUser customUser = (CustomUser) authentication.getPrincipal();
-        return userRepository.findByUsernameAndEmailAddress(customUser.getUsername(), customUser.getEmailAddress());
+        this.authenticationManager = authenticationManager;
     }
 
     public String updateUserData(Authentication authentication, UpdateUser updateUser) throws IOException {
         CustomUser customUser = (CustomUser) authentication.getPrincipal();
+        UserData userData = getUserData(authentication);
 
-        String imageName = "";
-        if (updateUser.image() != null && !updateUser.image().isEmpty()) {
-            String extension = Objects.requireNonNull(updateUser.image().getOriginalFilename()).replaceAll("^.*\\.(.*)$", "$1");
-            imageName = String.format("%s.%s", customUser.getUsername(), extension);
-        }
+        String imageName = getImageName(updateUser, userData);
 
-        int updateResult = userRepository.updateUserData(customUser.getUsername(), customUser.getEmailAddress(), updateUser.fullName(), updateUser.username(), updateUser.emailAddress(), updateUser.birthdate(), imageName, updateUser.country());
+        int updateResult = userRepository.updateUserData(userData.getUsername(), userData.getEmailAddress(), updateUser.fullName(), updateUser.username(), updateUser.emailAddress(), updateUser.birthdate(), imageName, updateUser.country());
+
         if (updateResult == 1) {
-            customUser.setEmailAddress(updateUser.emailAddress());
             customUser.setUsername(updateUser.username());
+            customUser.setEmailAddress(updateUser.emailAddress());
 
-            if (!imageName.isEmpty()) {
-                fileService.deleteImage(customUser.getUsername(), FileService.Types.PROFILE);
+            if (updateUser.image() != null) {
+                fileService.deleteImage(userData.getUsername(), FileService.Types.PROFILE);
                 fileService.storeImage(imageName, updateUser.image(), FileService.Types.PROFILE);
             }
+            fileService.updateImageName(userData.getImage(), imageName, FileService.Types.PROFILE);
+
             return tokenService.generateToken(authentication);
         }
         return "Something went wrong";
     }
 
     public String updatePassword(Authentication authentication, ResetPassword resetPassword) {
-
         CustomUser customUser = (CustomUser) authentication.getPrincipal();
 
         if (userRepository.updatePassword(customUser.getUsername(), customUser.getEmailAddress(), bCryptPasswordEncoder.encode(resetPassword.newPassword())) == 1) {
@@ -69,17 +72,41 @@ public class UserService {
         return "Something went wrong";
     }
 
+    public String resetPassword(Authentication authentication, ResetPasswordWithToken resetPasswordWithToken) {
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+
+        if (userRepository.resetPassword(customUser.getUsername(), customUser.getEmailAddress(), resetPasswordWithToken.token(), bCryptPasswordEncoder.encode(resetPasswordWithToken.newPassword())) == 1) {
+            return "SUCCESS";
+        }
+        return "Something went wrong";
+    }
+
     public String deleteUserData(Authentication authentication) throws IOException {
         CustomUser customUser = (CustomUser) authentication.getPrincipal();
 
         UserData userData = userRepository.findByUsernameAndEmailAddress(customUser.getUsername(), customUser.getEmailAddress());
-
-        if (userRepository.deleteUserAuthorities(userData.getId()) == 1) {
-            if (userRepository.deleteUser(customUser.getUsername(), customUser.getEmailAddress()) == 1) {
-                fileService.deleteImage(customUser.getUsername(), FileService.Types.PROFILE);
-                return "SUCCESS";
-            }
+        if (authService.clearData(userData.getId())) {
+            fileService.deleteImage(customUser.getUsername(), FileService.Types.PROFILE);
+            return "SUCCESS";
         }
         return "Something went wrong";
+    }
+
+    public UserData getUserData(Authentication authentication) {
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+        return userRepository.findByUsernameAndEmailAddress(customUser.getUsername(), customUser.getEmailAddress());
+    }
+
+    private static String getImageName(UpdateUser updateUser, UserData userData) {
+        String imageName;
+
+        if (updateUser.image() != null && !updateUser.image().isEmpty()) {
+            String extension = Objects.requireNonNull(updateUser.image().getOriginalFilename()).replaceAll("^.*\\.(.*)$", "$1");
+            imageName = String.format("%s.%s", updateUser.username(), extension);
+        } else {
+            String extension = (userData.getImage().replaceAll("^.*\\.(.*)$", "$1"));
+            imageName = String.format("%s.%s", updateUser.username(), extension);
+        }
+        return imageName;
     }
 }

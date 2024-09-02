@@ -28,13 +28,13 @@ public class DeleteUserValidator implements ConstraintValidator<ValidDeleteUser,
 
     @Override
     public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext){
-        String string = object.toString();
+        String verificationString = object.toString();
 
         Authentication authentication = authService.getAuthentication();
         CustomUser customUser = (CustomUser) authentication.getPrincipal();
 
         String valid = String.format("%s%s", customUser.getUsername(), "/delete");
-        boolean isValid = string.equals(message);
+        boolean isValid = verificationString.equals(message);
 
         if (!isValid) {
             constraintValidatorContext.disableDefaultConstraintViolation();
@@ -42,7 +42,7 @@ public class DeleteUserValidator implements ConstraintValidator<ValidDeleteUser,
                     .buildConstraintViolationWithTemplate(String.format("%s %s", message, valid))
                     .addConstraintViolation();
         }
-        return string.equals(String.format("%s%s", customUser.getUsername(), "/delete"));
+        return verificationString.equals(String.format("%s%s", customUser.getUsername(), "/delete"));
     }
 
     @Override

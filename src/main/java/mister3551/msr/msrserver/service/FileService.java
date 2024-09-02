@@ -58,6 +58,16 @@ public class FileService {
         }
     }
 
+    public void updateImageName(String oldImageName, String newImageName, Types types) throws IOException {
+        Path location = getPath(types);
+
+        Path oldFilePath = location.resolve(oldImageName);
+        if (Files.exists(oldFilePath)) {
+            Path newFilePath = location.resolve(newImageName);
+            Files.move(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
     private Path getPath(Types types) {
         Path location;
 

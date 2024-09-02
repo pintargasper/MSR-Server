@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Confirm email</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f7f7f7;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+            }
+            .container {
+                max-width: 600px;
+                margin: 40px auto;
+                background-color: #f3f3f3;
+                padding: 20px 30px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                text-align: center;
+                color: #333333;
+                font-size: 24px;
+            }
+            p {
+                font-size: 16px;
+                color: #555555;
+                margin: 15px 0;
+            }
+            .button {
+                background-color: #ce1212;
+                border: none;
+                padding: 12px 40px;
+                color: #ffffff !important;
+                transition: background-color 0.4s, box-shadow 0.4s, transform 0.2s;
+                border-radius: 50px;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+            .button:hover {
+                background-color: #ec2727;
+                box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            }
+            a {
+                color: #ec2727 !important;
+            }
+            .link {
+                word-wrap: break-word;
+                color: #ec2727;
+            }
+            .footer {
+                text-align: center;
+                font-size: 14px;
+                color: #999999;
+                margin-top: 20px;
+            }
+            .footer p {
+                margin: 5px 0;
+            }
+            .text-center {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Email Confirmation</h1>
+            <p>Dear {{name}},</p>
+            <p>Thank you for signing up for our service. Please click the button below to confirm your email address.</p>
+            <div class="text-center">
+                <a href="https://msr.gasperpintar.com/confirm/{{token}}" class="button">Confirm Email</a>
+            </div>
+            <p>If the button above does not work, you can also copy and paste the following link into your browser.</p>
+            <a href="https://msr.gasperpintar.com/confirm/{{token}}" class="link">https://msr.gasperpintar.com/confirm</a>
+            <p>If you did not sign up for our service, please ignore this email.</p>
+            <div class="footer">
+                <p>Best regards,</p>
+                <p>The Memo Stick Rescue Team</p>
+            </div>
+        </div>
+    </body>
+</html>

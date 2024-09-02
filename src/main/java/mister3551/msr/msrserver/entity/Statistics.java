@@ -19,11 +19,16 @@ public class Statistics {
     private Long winPercentage;
     private Long score;
     private Float money;
+    private Float moneyPerMinute;
     private String timePlayed;
     private Long kills;
     private Long deaths;
-    private Long killDeathRatio;
+    private Float killDeathRatio;
+    private Float accuracy;
     private String weaponName;
-    private Long weaponKills;
     private String weaponImage;
+    private Long weaponKills;
+    private String missionName;
+    private String missionImage;
+    private String missionScore;
 }

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class TokenService {
 
     private final JwtEncoder encoder;
+    private final String issuer = "Memo Stick Rescue";
 
     public TokenService(JwtEncoder encoder) {
         this.encoder = encoder;
@@ -44,7 +45,7 @@ public class TokenService {
 
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(authentication.getName())
+                .issuer(issuer)
                 .issuedAt(now)
                 .expiresAt(now.plus(1L, ChronoUnit.DAYS))
                 .subject(authentication.getName())
@@ -76,7 +77,7 @@ public class TokenService {
 
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(signUpRequest.emailAddress())
+                .issuer(issuer)
                 .issuedAt(now)
                 .expiresAt(now.plus(1L, ChronoUnit.DAYS))
                 .subject(type)

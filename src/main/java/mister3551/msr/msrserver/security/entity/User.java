@@ -24,9 +24,12 @@ public class User {
     private String authorities;
     private LocalDate birthdate;
     private String country;
+    private String emailToken;
     private boolean accountConfirmed;
     private boolean accountLocked;
     private LocalDateTime unlockDate;
+    private LocalDateTime passwordResetTimer;
+    private String passwordResetToken;
     private LocalDateTime passwordChangeTimer;
     private int reportsNumber;
 }

@@ -73,36 +73,47 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .cors(cors -> cors.configure(http))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/sign-up").permitAll()
+                                .requestMatchers(
+                                        "/sign-up",
+                                        "/get-news",
+                                        "/news/{title}",
+                                        "/news/suggestions/{title}",
+                                        "/images/{path}/{name}",
+                                        "/countries",
+                                        "/favicon.ico",
+                                        "/auth/error",
+                                        "/user/password/forgot"
+                                ).permitAll()
 
-                                .requestMatchers("/get-news").permitAll()
-                                .requestMatchers("/news/{title}").permitAll()
-                                .requestMatchers("/news/suggestions/{title}").permitAll()
+                                .requestMatchers(
+                                        "/user/confirm"
+                                ).hasAuthority("CONFIRM_EMAIL")
 
-                                .requestMatchers("/images/{path}/{name}").permitAll()
+                                .requestMatchers(
+                                        "/user/password/reset"
+                                ).hasAuthority("CHANGE_EMAIL")
 
-                                .requestMatchers("/countries").permitAll()
+                                .requestMatchers(
+                                        "/user/statistics",
+                                        "/user/weapon/statistics",
+                                        "/user/mission/statistics",
+                                        "/user/mission/single/statistics",
+                                        "/auth/user"
+                                ).hasAnyAuthority("ROLE_USER")
 
-                                .requestMatchers("/favicon.ico").permitAll()
+                                .requestMatchers(
+                                        "/auth/admin",
+                                        "/dashboard"
+                                ).hasAuthority("ROLE_ADMIN")
 
-                                .requestMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-
-                                .requestMatchers("/user/statistics").hasAnyAuthority("ROLE_USER")
-                                .requestMatchers("/user/weapon/statistics").hasAnyAuthority("ROLE_USER")
-
-                                .requestMatchers("/user/data").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                                .requestMatchers("/user/update").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                                .requestMatchers("/user/change-password").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                                .requestMatchers("/user/delete").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-
-                                //Auth
-                                .requestMatchers("/auth/admin").hasAuthority("ROLE_ADMIN")
-                                .requestMatchers("/auth/user").hasAnyAuthority("ROLE_USER")
-                                .requestMatchers("/auth/public").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                                .requestMatchers("/auth/error").permitAll()
-
-                                //Admin
-                                .requestMatchers("/dashboard").hasAuthority("ROLE_ADMIN")
+                                .requestMatchers(
+                                        "/user",
+                                        "/user/data",
+                                        "/user/update",
+                                        "/user/password/change",
+                                        "/user/delete",
+                                        "/auth/public"
+                                ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2

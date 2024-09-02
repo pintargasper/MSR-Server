@@ -3,6 +3,7 @@ package mister3551.msr.msrserver.security.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import mister3551.msr.msrserver.record.ResetPassword;
+import mister3551.msr.msrserver.record.ResetPasswordWithToken;
 import mister3551.msr.msrserver.security.entity.User;
 import mister3551.msr.msrserver.security.record.SignUpRequest;
 import mister3551.msr.msrserver.security.repository.UsersRepository;
@@ -66,7 +67,7 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Obj
             CustomUser customUser = (CustomUser) authentication.getPrincipal();
             User user = usersRepository.findByUsernameOrEmailAddress(customUser.getUsername(), customUser.getEmailAddress());
 
-            if (user.getPasswordChangeTimer().isAfter(LocalDateTime.now())) {
+            if (user != null && user.getPasswordChangeTimer() != null && user.getPasswordChangeTimer().isAfter(LocalDateTime.now())) {
 
                 long remainingMinutes  = Duration.between(LocalDateTime.now(), user.getPasswordChangeTimer()).toMinutes();
                 long hours = TimeUnit.MINUTES.toHours(remainingMinutes);
@@ -79,12 +80,15 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Obj
                 return false;
             }
 
-            if (!bCryptPasswordEncoder.matches(resetPassword.currentPassword(), user.getPassword())) {
+            if (user != null && !bCryptPasswordEncoder.matches(resetPassword.currentPassword(), user.getPassword())) {
                 constraintViolation(constraintValidatorContext, currentPassword);
                 return false;
             }
             password = resetPassword.newPassword();
             confirmPassword = resetPassword.confirmPassword();
+        } else if (object instanceof ResetPasswordWithToken resetPasswordWithToken) {
+            password = resetPasswordWithToken.newPassword();
+            confirmPassword = resetPasswordWithToken.confirmPassword();
         }
 
         if (password.length() < 8 || confirmPassword.length() > 16) {
