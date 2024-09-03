@@ -6,12 +6,9 @@ import mister3551.msr.msrserver.record.ResetPasswordWithToken;
 import mister3551.msr.msrserver.record.UpdateUser;
 import mister3551.msr.msrserver.repository.UserRepository;
 import mister3551.msr.msrserver.security.security.CustomUser;
-import mister3551.msr.msrserver.security.security.converter.AuthenticationToken;
 import mister3551.msr.msrserver.security.service.AuthService;
 import mister3551.msr.msrserver.security.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,16 +24,14 @@ public class UserService {
     private final FileService fileService;
     private final AuthService authService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserService(UserRepository userRepository, TokenService tokenService, FileService fileService, AuthService authService, BCryptPasswordEncoder bCryptPasswordEncoder, AuthenticationManager authenticationManager) {
+    public UserService(UserRepository userRepository, TokenService tokenService, FileService fileService, AuthService authService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.fileService = fileService;
         this.authService = authService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.authenticationManager = authenticationManager;
     }
 
     public String updateUserData(Authentication authentication, UpdateUser updateUser) throws IOException {
@@ -55,8 +50,10 @@ public class UserService {
                 fileService.deleteImage(userData.getUsername(), FileService.Types.PROFILE);
                 fileService.storeImage(imageName, updateUser.image(), FileService.Types.PROFILE);
             }
-            fileService.updateImageName(userData.getImage(), imageName, FileService.Types.PROFILE);
 
+            if (!userData.getImage().equals("basic-image.jpg")) {
+                fileService.updateImageName(userData.getImage(), imageName, FileService.Types.PROFILE);
+            }
             return tokenService.generateToken(authentication);
         }
         return "Something went wrong";

@@ -14,7 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -37,7 +39,7 @@ public class EmailService {
         return userRepository.confirmEmailAddress(customUser.getUsername(), customUser.getEmailAddress(), emailToken.token()) == 1 ? "SUCCESS" : "Something went wrong";
     }
 
-    public void sendConfirmEmail(SignUpRequest signUpRequest, String generatedToken) throws IOException, javax.mail.MessagingException {
+    public boolean sendConfirmEmail(SignUpRequest signUpRequest, String generatedToken) throws IOException, javax.mail.MessagingException {
         final String sender = "email";
         final String password = "password";
 
@@ -46,11 +48,15 @@ public class EmailService {
         String fullName = replaceSpecialCharacters(signUpRequest.fullName());
         String token = replaceSpecialCharacters(generatedToken);
 
-        String body = new String(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("templates/confirm.html")).readAllBytes(), StandardCharsets.UTF_8)
-                .replace("{{name}}", fullName)
-                .replace("{{token}}", token);
-
-        EmailSender.send(sender, password, signUpRequest.emailAddress(), subject, body);
+        String body;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("templates/confirm.html")) {
+            body = new String(Objects.requireNonNull(inputStream).readAllBytes(), StandardCharsets.UTF_8)
+                    .replace("{{name}}", fullName)
+                    .replace("{{token}}", token);
+        } catch (FileNotFoundException fileNotFoundException) {
+            return false;
+        }
+        return EmailSender.send(sender, password, signUpRequest.emailAddress(), subject, body);
     }
 
     public String resetEmail(EmailAddress emailAddress) throws IOException, MessagingException {
@@ -75,10 +81,18 @@ public class EmailService {
 
         if (userRepository.setPasswordResetToken(user.getUsername(), user.getEmailAddress(), token) == 1) {
 
-            String body = new String(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("templates/resetPassword.html")).readAllBytes(), StandardCharsets.UTF_8)
-                    .replace("{{name}}", user.getFullName())
-                    .replace("{{token}}", token);
-            return EmailSender.send(sender, password, emailAddress.emailAddress(), subject, body) ? "SUCCESS" : "Something went wrong";
+            String body;
+            try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("templates/resetPassword.html")) {
+                body = new String(Objects.requireNonNull(inputStream).readAllBytes(), StandardCharsets.UTF_8)
+                        .replace("{{name}}", user.getFullName())
+                        .replace("{{token}}", token);
+            } catch (FileNotFoundException fileNotFoundException) {
+                return "Something went wrong";
+            }
+            if (EmailSender.send(sender, password, emailAddress.emailAddress(), subject, body)) {
+                return "SUCCESS";
+            }
+            return "Something went wrong";
         }
         return "Something went wrong";
     }

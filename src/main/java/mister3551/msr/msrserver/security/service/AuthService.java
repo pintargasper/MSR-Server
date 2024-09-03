@@ -155,18 +155,20 @@ public class AuthService {
                 return "Something went wrong";
             }
 
-            Long userId = userData.getId();
-
-            boolean success = usersRepository.insertUserRole(userId) == 1 &&
-                    usersRepository.insertUserStatistics(userId) == 1 &&
-                    usersRepository.insertUserMissionsStatistics(userId) == 1 &&
-                    usersRepository.insertUserWeaponsStatistics(userId) == 1;
+            boolean success = usersRepository.insertUserRole(userData.getId()) == 1 &&
+                    usersRepository.insertUserStatistics(userData.getId()) == 1 &&
+                    usersRepository.insertUserMissionsStatistics(userData.getId()) == 1 &&
+                    usersRepository.insertUserWeaponsStatistics(userData.getId()) == 1;
 
             if (!success) {
-                clearData(userId);
+                clearData(userData.getId());
                 return "Something went wrong";
             }
-            emailService.sendConfirmEmail(signUpRequest, generatedToken);
+
+            if (!emailService.sendConfirmEmail(signUpRequest, generatedToken)) {
+                clearData(userData.getId());
+                return "Something went wrong";
+            }
             return "SUCCESS";
         }
         return "Something went wrong";
