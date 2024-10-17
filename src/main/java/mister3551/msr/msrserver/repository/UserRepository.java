@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<UserData, Long> {
             "    u.username = :username, " +
             "    u.email_address = :emailAddress, " +
             "    u.birthdate = :birthdate, " +
-            "    u.image = :image, " +
+            "    u.image = IF(:image IS NOT NULL, :image, u.image), " +
             "    u.country = c.id_country " +
             "WHERE u.username = :oldUsername AND u.email_address = :oldEmailAddress;", nativeQuery = true)
     int updateUserData(@Param("oldUsername") String oldUsername,

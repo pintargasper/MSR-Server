@@ -41,6 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getPassword(),
                 user.getEmailAddress(),
                 grantedAuthorities,
+                user.getImage(),
                 user.getCountry(),
                 user.isAccountConfirmed(),
                 user.isAccountLocked()

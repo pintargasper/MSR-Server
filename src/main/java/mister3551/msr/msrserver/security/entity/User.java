@@ -22,6 +22,7 @@ public class User {
     private String emailAddress;
     private String password;
     private String authorities;
+    private String image;
     private LocalDate birthdate;
     private String country;
     private String emailToken;

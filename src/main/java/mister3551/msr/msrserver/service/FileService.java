@@ -61,6 +61,10 @@ public class FileService {
     public void updateImageName(String oldImageName, String newImageName, Types types) throws IOException {
         Path location = getPath(types);
 
+        if (oldImageName.startsWith("https:")) {
+            return;
+        }
+
         Path oldFilePath = location.resolve(oldImageName);
         if (Files.exists(oldFilePath)) {
             Path newFilePath = location.resolve(newImageName);

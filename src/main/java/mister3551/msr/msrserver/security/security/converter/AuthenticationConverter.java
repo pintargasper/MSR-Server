@@ -28,6 +28,7 @@ public class AuthenticationConverter implements Converter<Jwt, AuthenticationTok
                 "",
                 user.get("emailAddress"),
                 authorities,
+                user.get("image"),
                 user.get("country"),
                 Boolean.parseBoolean(String.valueOf(user.get("accountConfirmed"))),
                 Boolean.parseBoolean(String.valueOf(user.get("accountLocked"))));

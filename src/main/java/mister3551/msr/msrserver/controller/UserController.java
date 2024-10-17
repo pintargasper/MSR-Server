@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import mister3551.msr.msrserver.entity.UserData;
 import mister3551.msr.msrserver.record.DeleteUser;
 import mister3551.msr.msrserver.record.ResetPassword;
-import mister3551.msr.msrserver.record.ResetPasswordWithToken;
 import mister3551.msr.msrserver.record.UpdateUser;
 import mister3551.msr.msrserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,6 @@ public class UserController {
         return userService.getUserData(authentication);
     }
 
-    //@RequestBody za postman @ModelAttribute za react
     @PostMapping("/user/update")
     public String updateUserData(Authentication authentication, @Valid @ModelAttribute UpdateUser updateUser) throws IOException {
         return userService.updateUserData(authentication, updateUser);
@@ -39,10 +37,10 @@ public class UserController {
         return userService.updatePassword(authentication, resetPassword);
     }
 
-    @PostMapping("/user/password/reset")
+    /*@PostMapping("/user/password/reset")
     public String resetPassword(Authentication authentication, @Valid @RequestBody ResetPasswordWithToken resetPasswordWithToken) {
         return userService.resetPassword(authentication, resetPasswordWithToken);
-    }
+    }*/
 
     @PostMapping("/user/delete")
     public String deleteUserData(Authentication authentication, @Valid @RequestBody DeleteUser deleteUser) throws IOException {

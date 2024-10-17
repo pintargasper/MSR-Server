@@ -6,10 +6,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import mister3551.msr.msrserver.entity.UserData;
 import mister3551.msr.msrserver.repository.UserRepository;
 import mister3551.msr.msrserver.security.entity.User;
+import mister3551.msr.msrserver.security.record.SignInGoogleRequest;
 import mister3551.msr.msrserver.security.record.SignInRequest;
 import mister3551.msr.msrserver.security.record.SignUpRequest;
 import mister3551.msr.msrserver.security.repository.UsersRepository;
 import mister3551.msr.msrserver.security.security.CustomUser;
+import mister3551.msr.msrserver.security.security.converter.AuthenticationToken;
 import mister3551.msr.msrserver.security.security.handler.SignOutSuccessHandler;
 import mister3551.msr.msrserver.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +20,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -127,32 +131,67 @@ public class AuthService {
         return new String[]{token, username};
     }
 
-    public String signUp(SignUpRequest signUpRequest) throws IOException, MessagingException {
+    public String[] signInGoogle(SignInGoogleRequest signInGoogleRequest) {
+        User userByEmail = usersRepository.findByEmailAddress(signInGoogleRequest.email());
+
+        String token;
+        String username;
+
+        if (userByEmail != null) {
+            try {
+                List<GrantedAuthority> authorities = Arrays.stream(userByEmail.getAuthorities().split(","))
+                        .map(String::trim)
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+                CustomUser customUser = new CustomUser(
+                        userByEmail.getFullName(),
+                        userByEmail.getUsername(),
+                        userByEmail.getPassword(),
+                        userByEmail.getEmailAddress(),
+                        authorities,
+                        userByEmail.getImage(),
+                        userByEmail.getCountry(),
+                        userByEmail.isAccountConfirmed(),
+                        userByEmail.isAccountLocked());
+
+                token = tokenService.generateToken(new AuthenticationToken(authorities, customUser));
+                username = customUser.getUsername();
+            } catch (BadCredentialsException badCredentialsException) {
+                return new String[]{"Bad Credentials"};
+            }
+            return new String[]{token, username};
+        }
+        return new String[]{"Sign up"};
+    }
+
+    public String[] signUp(SignUpRequest signUpRequest) {
         User userByUsername = usersRepository.findByUsername(signUpRequest.username());
         User userByEmail = usersRepository.findByEmailAddress(signUpRequest.emailAddress());
 
         if (userByUsername != null) {
-            return "Username already exists";
+            return new String[]{"Username already exists"};
         }
 
         if (userByEmail != null) {
-            return "Email address already exists";
+            return new String[]{"Email address already exists"};
         }
 
-        String generatedToken = tokenService.generateEmailToken(signUpRequest, "CONFIRM_EMAIL");
+        String generatedToken = signUpRequest.email_verified() == 0 ? tokenService.generateEmailToken(signUpRequest, "CONFIRM_EMAIL") : "1";
 
         if (usersRepository.insertUser(
                 signUpRequest.fullName(),
                 signUpRequest.username(),
                 signUpRequest.emailAddress(),
                 bCryptPasswordEncoder.encode(signUpRequest.password()),
+                signUpRequest.image(),
                 signUpRequest.birthdate(),
                 signUpRequest.country(),
                 generatedToken) == 1) {
 
             UserData userData = userRepository.findByUsernameAndEmailAddress(signUpRequest.username(), signUpRequest.emailAddress());
             if (userData == null) {
-                return "Something went wrong";
+                return new String[]{"Something went wrong"};
             }
 
             boolean success = usersRepository.insertUserRole(userData.getId()) == 1 &&
@@ -162,16 +201,11 @@ public class AuthService {
 
             if (!success) {
                 clearData(userData.getId());
-                return "Something went wrong";
+                return new String[]{"Something went wrong"};
             }
-
-            if (!emailService.sendConfirmEmail(signUpRequest, generatedToken)) {
-                clearData(userData.getId());
-                return "Something went wrong";
-            }
-            return "SUCCESS";
+            return signIn(new SignInRequest(signUpRequest.username(), signUpRequest.password()));
         }
-        return "Something went wrong";
+        return new String[]{"Something went wrong"};
     }
 
     public void signOut(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws ServletException, IOException {

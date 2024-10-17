@@ -56,9 +56,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     SecurityFilterChain tokenSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/admin", "/sign-in")
+                .securityMatcher("/admin", "/sign-in", "/sign-in-google")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin", "/sign-in").permitAll()
+                        .requestMatchers("/admin", "/sign-in", "/sign-in-google").permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)

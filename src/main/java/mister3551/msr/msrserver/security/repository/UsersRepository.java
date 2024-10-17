@@ -15,14 +15,15 @@ public interface UsersRepository extends JpaRepository<User, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO users (full_name, username, email_address, password, birthdate, country, account_confirmed) " +
-            "SELECT :fullName, :username, :emailAddress, :password, :birthdate, c.id_country, :token " +
+    @Query(value = "INSERT INTO users (full_name, username, email_address, password, image, birthdate, country, account_confirmed) " +
+            "SELECT :fullName, :username, :emailAddress, :password, IF(:image IS NULL OR :image = '', 'basic-image.jpg', :image), :birthdate, c.id_country, :token " +
             "FROM countries c " +
             "WHERE c.nice_name = :country;", nativeQuery = true)
     int insertUser(@Param("fullName") String fullName,
                    @Param("username") String username,
                    @Param("emailAddress") String emailAddress,
                    @Param("password") String password,
+                   @Param("image") String image,
                    @Param("birthdate") String birthdate,
                    @Param("country") String country,
                    @Param("token") String token);

@@ -12,8 +12,10 @@ public record SignUpRequest(
         String emailAddress,
         String password,
         String confirmPassword,
+        String image,
         @ValidBirthdate
         String birthdate,
         @ValidCountry
-        String country) {
+        String country,
+        int email_verified) {
 }

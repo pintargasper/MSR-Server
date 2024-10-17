@@ -38,7 +38,7 @@ public class UserService {
         CustomUser customUser = (CustomUser) authentication.getPrincipal();
         UserData userData = getUserData(authentication);
 
-        String imageName = getImageName(updateUser, userData);
+        String imageName = updateUser.image() == null && userData.getImage().startsWith("https:") ? null : getImageName(updateUser, userData);
 
         int updateResult = userRepository.updateUserData(userData.getUsername(), userData.getEmailAddress(), updateUser.fullName(), updateUser.username(), updateUser.emailAddress(), updateUser.birthdate(), imageName, updateUser.country());
 
@@ -51,7 +51,7 @@ public class UserService {
                 fileService.storeImage(imageName, updateUser.image(), FileService.Types.PROFILE);
             }
 
-            if (!userData.getImage().equals("basic-image.jpg")) {
+            if (!userData.getImage().equals("basic-image.jpg") && imageName != null) {
                 fileService.updateImageName(userData.getImage(), imageName, FileService.Types.PROFILE);
             }
             return tokenService.generateToken(authentication);

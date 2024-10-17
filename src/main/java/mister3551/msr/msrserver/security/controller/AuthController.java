@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import mister3551.msr.msrserver.security.record.SignInGoogleRequest;
 import mister3551.msr.msrserver.security.record.SignInRequest;
 import mister3551.msr.msrserver.security.record.SignUpRequest;
 import mister3551.msr.msrserver.security.service.AuthService;
@@ -33,8 +34,13 @@ public class AuthController {
         return authService.signIn(signInRequest);
     }
 
+    @PostMapping("/sign-in-google")
+    public String[] signInGoogle(@Valid @RequestBody SignInGoogleRequest signInGoogleRequest) {
+        return authService.signInGoogle(signInGoogleRequest);
+    }
+
     @PostMapping("/sign-up")
-    public String signUp(@Valid @RequestBody SignUpRequest signUpRequest) throws IOException, javax.mail.MessagingException {
+    public String[] signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         return authService.signUp(signUpRequest);
     }
 
